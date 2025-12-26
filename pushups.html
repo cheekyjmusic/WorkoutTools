@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Push-Up Counter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --bg: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  --glass: rgba(255, 255, 255, 0.08);
+  --accent: #00e676;
+  --danger: #ff5252;
+  --fire1: #ff9800;
+  --fire2: #ff5722;
+  --fire3: #ff1744;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.header {
+  text-align: center;
+  opacity: 0.85;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.counter {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.counter-number {
+  font-size: 6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.counter-label {
+  opacity: 0.7;
+  letter-spacing: 0.1em;
+}
+
+.goal-text {
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.progress {
+  margin: 16px auto 0;
+  width: 80%;
+  height: 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ff88, #00c853);
+  transition: width 0.2s ease;
+}
+
+/* 🔥 OVERDRIVE EFFECTS */
+.overdrive .progress-bar {
+  background: linear-gradient(
+    90deg,
+    var(--fire1),
+    var(--fire2),
+    var(--fire3),
+    var(--fire1)
+  );
+  background-size: 300% 100%;
+  animation: fireMove 0.6s linear infinite;
+  box-shadow:
+    0 0 10px var(--fire1),
+    0 0 20px var(--fire2),
+    0 0 35px var(--fire3);
+}
+
+.overdrive .progress::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px var(--fire2);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes fireMove {
+  from { background-position: 0% 0; }
+  to { background-position: 300% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+.tap-area {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tap-button {
+  width: 85vw;
+  max-width: 360px;
+  height: 45vh;
+  max-height: 360px;
+  background: radial-gradient(circle at top, #00ff88, #00c853);
+  border-radius: 28px;
+  border: none;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #003b1c;
+  box-shadow:
+    0 25px 50px rgba(0,0,0,0.4),
+    inset 0 -8px 0 rgba(0,0,0,0.15);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+.tap-button:active {
+  transform: translateY(4px) scale(0.99);
+}
+
+.footer {
+  display: flex;
+  gap: 12px;
+}
+
+.footer button {
+  flex: 1;
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: white;
+  padding: 14px 0;
+  border-radius: 14px;
+  font-size: 1rem;
+  backdrop-filter: blur(12px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>PUSH-UP COUNTER</h1>
+  </div>
+
+  <div class="counter">
+    <div class="counter-number" id="count">0</div>
+    <div class="counter-label">REPS</div>
+    <div class="goal-text" id="goalText">No goal set</div>
+
+    <div class="progress" id="progressWrap" style="display:none;">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <div class="tap-area">
+    <button class="tap-button" id="tap">TAP</button>
+  </div>
+
+  <div class="footer">
+    <button id="goal">Goal</button>
+    <button id="reset">Reset</button>
+  </div>
+</div>
+
+<script>
+let count = Number(localStorage.getItem("pushups")) || 0;
+let goal = Number(localStorage.getItem("goal")) || 0;
+
+const countEl = document.getElementById("count");
+const tapBtn = document.getElementById("tap");
+const resetBtn = document.getElementById("reset");
+const goalBtn = document.getElementById("goal");
+const goalText = document.getElementById("goalText");
+const progressWrap = document.getElementById("progressWrap");
+const progressBar = document.getElementById("progressBar");
+
+function vibrateOverdrive() {
+  if (navigator.vibrate) navigator.vibrate([25, 15, 25]);
+}
+
+function updateUI() {
+  countEl.textContent = count;
+
+  if (goal > 0) {
+    progressWrap.style.display = "block";
+    const percent = Math.min((count / goal) * 100, 100);
+    progressBar.style.width = percent + "%";
+
+    if (count >= goal) {
+      goalText.textContent = "OVERDRIVE MODE 🔥";
+      progressWrap.classList.add("overdrive");
+    } else {
+      goalText.textContent = `Goal: ${count} / ${goal}`;
+      progressWrap.classList.remove("overdrive");
+    }
+  } else {
+    goalText.textContent = "No goal set";
+    progressWrap.style.display = "none";
+    progressWrap.classList.remove("overdrive");
+  }
+}
+
+tapBtn.addEventListener("click", () => {
+  count++;
+  localStorage.setItem("pushups", count);
+  updateUI();
+
+  if (count > goal && goal > 0) {
+    vibrateOverdrive();
+  } else if (navigator.vibrate) {
+    navigator.vibrate(20);
+  }
+});
+
+goalBtn.addEventListener("click", () => {
+  const input = prompt("How many push-ups is your goal?");
+  const value = Number(input);
+  if (value > 0) {
+    goal = value;
+    localStorage.setItem("goal", goal);
+    updateUI();
+  }
+});
+
+resetBtn.addEventListener("click", () => {
+  if (confirm("Reset your push-up count?")) {
+    count = 0;
+    localStorage.setItem("pushups", 0);
+    updateUI();
+  }
+});
+
+updateUI();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Workout Mode</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --bg: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  --glass: rgba(255, 255, 255, 0.08);
+  --accent: #00e676;
+  --fire1: #ff9800;
+  --fire2: #ff5722;
+  --fire3: #ff1744;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  overflow: hidden;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+}
+
+.header p {
+  margin-top: 10px;
+  opacity: 0.75;
+  letter-spacing: 0.08em;
+}
+
+/* GLOW ORB BACKGROUND */
+.orb {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0,230,118,0.25), transparent 70%);
+  filter: blur(40px);
+  animation: float 6s ease-in-out infinite;
+}
+
+.orb.one {
+  top: 10%;
+  left: -50px;
+}
+
+.orb.two {
+  bottom: 15%;
+  right: -60px;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-25px); }
+}
+
+/* BUTTON GRID */
+.menu {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.card {
+  position: relative;
+  text-decoration: none;
+  color: white;
+  height: 160px;
+  border-radius: 26px;
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  transition: transform 0.15s ease;
+}
+
+.card:active {
+  transform: scale(0.97);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.15),
+    transparent
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  60% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+.card-content {
+  position: relative;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.card-sub {
+  margin-top: 8px;
+  opacity: 0.7;
+  letter-spacing: 0.08em;
+}
+
+/* FIRE ACCENT */
+.card.fire {
+  border-color: rgba(255,87,34,0.6);
+}
+
+.card.fire::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 32px;
+  box-shadow: 0 0 35px var(--fire2);
+  opacity: 0.5;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  opacity: 0.5;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="orb one"></div>
+<div class="orb two"></div>
+
+<div class="app">
+
+  <div class="header">
+    <h1>WORKOUT MODE</h1>
+    <p>Select your discipline</p>
+  </div>
+
+  <div class="menu">
+    <!-- PUSH UPS -->
+    <a href="#" class="card fire">
+      <div class="card-content">
+        <div class="card-title">PUSH UPS</div>
+        <div class="card-sub">Power • Reps • Overdrive</div>
+      </div>
+    </a>
+
+    <!-- PLANKS -->
+    <a href="#" class="card">
+      <div class="card-content">
+        <div class="card-title">PLANK</div>
+        <div class="card-sub">Core • Time • Endurance</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="footer">
+    NO EXCUSES
+  </div>
+
+</div>
+
+</body>
+</html>
