@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff4500">
   <link rel="icon" href="icon.ico">
 <meta charset="UTF-8">
 <title>Workout Mode</title>
@@ -176,6 +178,11 @@ body {
 }
 </style>
 </head>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
 
 <body>
 
@@ -215,5 +222,6 @@ body {
 
 </body>
 </html>
+
 
 
