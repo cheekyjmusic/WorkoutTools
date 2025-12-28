@@ -74,6 +74,13 @@ body::before {
   }
 }
 
+/* Ensure cards have vertical spacing on small screens */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(12px, 4vw, 20px);
+}
+
 @media (min-width: 1024px) {
   .app {
     max-width: 1000px;
