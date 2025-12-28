@@ -2,7 +2,7 @@
   "name": "Workout Tools",
   "short_name": "Workout",
   "start_url": "/index.html",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#0b0f14",
   "theme_color": "#ff4500",
   "icons": [

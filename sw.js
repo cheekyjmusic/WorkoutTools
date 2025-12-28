@@ -4,6 +4,7 @@ const FILES_TO_CACHE = [
   "/index.html",
   "/pushups.html",
   "/planks.html",
+  "/manual.html",
   "/manifest.json"
 ];
 
