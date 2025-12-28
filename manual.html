@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<title>Workout Manual</title>
+<meta name="theme-color" content="#ff4500">
+<link rel="icon" href="icon.ico">
+
+<style>
+:root {
+  --bg: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  --glass: rgba(255, 255, 255, 0.08);
+  --accent: #00e676;
+  --accent-light: #26ff8f;
+  --accent-glow: #00ff88;
+  --fire1: #ff9800;
+  --fire2: #ff5722;
+  --fire3: #ff1744;
+  --card-border: rgba(0, 230, 118, 0.15);
+  --card-border-active: rgba(0, 230, 118, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: white;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(0, 230, 118, 0.03) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(255, 87, 34, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  width: 100%;
+  padding: clamp(16px, 5vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 4vw, 32px);
+  margin: auto;
+  max-width: min(100%, 90vw);
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .app {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app {
+    max-width: 1000px;
+  }
+  
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: clamp(20px, 3vw, 32px);
+  }
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: clamp(8px, 2vw, 16px);
+  padding-bottom: clamp(16px, 3vw, 24px);
+  border-bottom: 2px solid var(--card-border);
+  animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  letter-spacing: 0.15em;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent), #00ff7f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(0, 230, 118, 0.2);
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 230, 118, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(0, 230, 118, 0.5)); }
+}
+
+.header p {
+  margin-top: clamp(8px, 1.5vw, 12px);
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.85;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  text-transform: uppercase;
+  animation: slideDown 0.8s ease-out 0.1s both;
+}
+
+/* TABS */
+.tabs-container {
+  display: flex;
+  gap: clamp(8px, 2vw, 16px);
+  overflow-x: auto;
+  padding: clamp(8px, 1.5vw, 12px) 0;
+  margin-bottom: clamp(8px, 2vw, 16px);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  animation: slideDown 0.8s ease-out 0.2s both;
+}
+
+.tabs-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tabs-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.tabs-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, var(--accent-light), var(--accent-glow));
+}
+
+.tab {
+  padding: clamp(10px, 2vw, 13px) clamp(16px, 3vw, 24px);
+  border: 2px solid var(--card-border);
+  border-radius: clamp(10px, 2vw, 14px);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 230, 118, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.tab:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 230, 118, 0.1);
+}
+
+.tab:hover::before {
+  left: 100%;
+}
+
+.tab.active {
+  border-color: var(--accent-light);
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.25), rgba(38, 255, 143, 0.15));
+  color: var(--accent-glow);
+  box-shadow: 0 0 25px rgba(0, 230, 118, 0.3), inset 0 0 25px rgba(0, 230, 118, 0.1);
+  font-weight: 700;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeInScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* SEARCH BAR */
+.search-container {
+  position: relative;
+  margin-bottom: clamp(12px, 2vw, 20px);
+  animation: slideDown 0.8s ease-out 0.3s both;
+}
+
+.search-input {
+  width: 100%;
+  padding: clamp(13px, 2.5vw, 17px) clamp(18px, 3vw, 24px);
+  font-size: clamp(0.95rem, 2vw, 1rem);
+  border: 2px solid var(--card-border);
+  border-radius: clamp(14px, 2.5vw, 18px);
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-light);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 40px rgba(0, 230, 118, 0.35), inset 0 0 20px rgba(0, 230, 118, 0.1);
+  transform: translateY(-2px);
+}
+
+.no-results {
+  text-align: center;
+  padding: clamp(40px, 5vw, 60px) clamp(20px, 3vw, 32px);
+  opacity: 0.6;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ACCORDION CARDS */
+.card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  border-radius: clamp(18px, 3vw, 28px);
+  border: 1.5px solid var(--card-border);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+              0 0 1px rgba(0, 230, 118, 0.1);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  animation: slideUp 0.6s ease-out both;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+.card:nth-child(5) { animation-delay: 0.25s; }
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-light), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 230, 118, 0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-12px);
+  border-color: var(--card-border-active);
+  box-shadow: 0 25px 60px rgba(0, 230, 118, 0.2),
+              0 0 40px rgba(0, 230, 118, 0.15);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+.card-header {
+  padding: clamp(20px, 3vw, 26px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.5vw, 1.4rem);
+  font-weight: 700;
+  flex: 1;
+  letter-spacing: 0.03em;
+  transition: all 0.3s ease;
+}
+
+.card.active .card-header h2 {
+  color: var(--accent-glow);
+  letter-spacing: 0.05em;
+}
+
+.card-content {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 clamp(20px, 3vw, 26px);
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease;
+}
+
+.card-content p {
+  margin: clamp(14px, 1.5vw, 18px) 0;
+  line-height: 1.75;
+  font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+  opacity: 0.92;
+  word-spacing: 0.05em;
+}
+
+.card-content p:first-of-type {
+  margin-top: 0;
+}
+
+.card-content ul {
+  padding-left: clamp(20px, 3vw, 26px);
+  margin: clamp(14px, 1.5vw, 18px) 0;
+  font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+}
+
+.card-content li {
+  margin: clamp(8px, 1vw, 10px) 0;
+  opacity: 0.88;
+  line-height: 1.7;
+  transition: all 0.2s ease;
+}
+
+.card.active .card-content li:hover {
+  opacity: 1;
+  margin-left: 4px;
+  color: var(--accent-light);
+}
+
+.card-content strong {
+  color: var(--accent);
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.card.active .card-content strong {
+  color: var(--accent-light);
+}
+
+/* ACTIVE CARD */
+.card.active {
+  border-color: var(--card-border-active);
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.08), rgba(38, 255, 143, 0.03));
+  box-shadow: 0 20px 60px rgba(0, 230, 118, 0.25),
+              inset 0 1px 0 rgba(0, 230, 118, 0.1);
+}
+
+.card.active .card-content {
+  max-height: 3000px;
+  padding-bottom: clamp(20px, 3vw, 26px);
+}
+
+.arrow {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--accent);
+  opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 230, 118, 0.1);
+}
+
+.card:hover .arrow {
+  opacity: 1;
+  background: rgba(0, 230, 118, 0.2);
+}
+
+.card.active .arrow {
+  transform: rotate(90deg);
+  color: var(--accent-glow);
+  background: rgba(0, 230, 118, 0.25);
+  box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent), var(--accent-light));
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent-light), var(--accent-glow));
+  box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
+}
+
+@media (min-width: 1400px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>Workout Manual</h1>
+    <p>Advanced Training Guide</p>
+  </div>
+
+  <div class="search-container">
+    <input 
+      type="text" 
+      class="search-input" 
+      id="searchInput" 
+      placeholder="Search topics..."
+    >
+  </div>
+
+  <div class="tabs-container">
+    <button class="tab active" data-tab="all">All Topics</button>
+    <button class="tab" data-tab="goals">Training Goals</button>
+    <button class="tab" data-tab="methods">Training Methods</button>
+    <button class="tab" data-tab="nutrition">Nutrition & Recovery</button>
+    <button class="tab" data-tab="mindset">Mindset</button>
+  </div>
+
+  <!-- ALL TAB -->
+  <div class="tab-content active" data-tab="all">
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Hypertrophy</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Hypertrophy</strong> is the process of increasing muscle fiber size through mechanical tension and metabolic stress. Research shows optimal growth occurs with moderate loads (65-85% 1RM) and moderate rep ranges (6-15 reps).</p>
+          <ul>
+            <li><strong>Volume matters:</strong> Aim for 10-20 sets per muscle group weekly (Schoenfeld, 2016). Total tonnage (weight × reps × sets) is a primary driver of hypertrophy.</li>
+            <li><strong>Compound + isolation:</strong> Squats, bench press, rows for recruitment; leg curls, chest flyes for specific tension.</li>
+            <li><strong>Time under tension:</strong> 40-60 seconds per set optimal. Slower eccentric (2-3s) increases mechanical damage.</li>
+            <li><strong>Frequency:</strong> Train each muscle 2x/week minimum for superior hypertrophy (Schoenfeld et al., 2015).</li>
+            <li><strong>Progressive overload:</strong> Increase weight 2.5-5% when hitting target reps, or add 1-2 reps weekly.</li>
+          </ul>
+          <p><strong>Nutrition:</strong> Caloric surplus of 300-500 kcal/day. Protein: 1.6-2.2g/kg body weight. Carbs support high-volume training performance.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Strength</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Strength training</strong> maximizes force production through neural adaptations and muscle fiber recruitment. Heavy loads (85-95% 1RM) with low reps (1-6) are most effective.</p>
+          <ul>
+            <li><strong>Intensity over volume:</strong> Heavy loads (>85% 1RM) recruit fast-twitch fibers most effectively. Even 3-5 total reps can drive strength gains.</li>
+            <li><strong>Recovery emphasis:</strong> Rest 3-5 minutes between sets to recover phosphocreatine stores and CNS function (Kraemer et al., 2002).</li>
+            <li><strong>Compound lifts dominate:</strong> Squat, deadlift, bench press, overhead press, rows. These transfer best to real-world strength.</li>
+            <li><strong>Frequency consideration:</strong> 2-3x/week per lift allows adequate CNS recovery while permitting sufficient practice volume.</li>
+            <li><strong>Periodization critical:</strong> Cycle intensity waves (Heavy → Moderate → Light) every 3-4 weeks to prevent plateaus and deload.</li>
+          </ul>
+          <p><strong>Nutrition:</strong> Maintenance or slight surplus. Protein: 1.6-2.2g/kg. Creatine (5g/day) shown to improve strength gains by ~10% (Kreider et al., 2017).</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Endurance</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Muscular endurance</strong> is the ability to sustain muscular force or power over extended periods. This requires high reps (12-30+) and metabolic conditioning.</p>
+          <ul>
+            <li><strong>Rep ranges:</strong> 12-20+ reps build capillarization and mitochondrial density (Schoenfeld, 2010). Higher reps increase metabolic byproduct accumulation (lactate, H+).</li>
+            <li><strong>Short rest periods:</strong> 30-60 seconds maintains metabolic stress and hormonal response. Limits recovery between sets.</li>
+            <li><strong>Circuit training:</strong> Alternating muscle groups allows CNS recovery while maintaining elevated heart rate. Improves work capacity.</li>
+            <li><strong>Aerobic base:</strong> 2-3x/week low-intensity steady-state cardio improves oxygen utilization and recovery capacity.</li>
+            <li><strong>Work capacity:</strong> Building GPP (General Physical Preparedness) through circuits and conditioning improves all athletic qualities.</li>
+          </ul>
+          <p><strong>Nutrition:</strong> Caloric balance maintained. Carbs critical for glycogen availability in high-rep work. Hydration essential for sweat loss.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Weight Loss</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Fat loss</strong> requires a caloric deficit while preserving lean muscle mass. Strength training and adequate protein are essential safeguards.</p>
+          <ul>
+            <li><strong>Caloric deficit:</strong> 300-500 kcal/day deficit yields ~0.5-1 lb/week loss. Avoid >20% deficit (increases muscle loss).</li>
+            <li><strong>Preserve muscle:</strong> Strength training 3x/week with heavy loads (>75% 1RM) is most effective at preserving lean mass during deficit (Helms et al., 2014).</li>
+            <li><strong>Protein critical:</strong> 2.0-2.4g/kg during deficit. High protein reduces DOMS, preserves strength, increases satiety.</li>
+            <li><strong>Cardio strategic:</strong> 2-3x/week moderate-intensity preferred over excessive low-intensity. HIIT 1x/week can preserve muscle better than steady cardio.</li>
+            <li><strong>Track composition:</strong> Scale weight unreliable (water/glycogen fluctuations). Use photos, measurements, how clothes fit, and strength metrics.</li>
+          </ul>
+          <p><strong>Nutrition:</strong> Protein: 2g/kg body weight. Prioritize whole foods for satiety. Caloric tracking initially to learn portions.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Weight Gain / Bulking</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Lean bulking</strong> (body recomposition) requires a controlled caloric surplus with progressive overload. The goal is muscle gain while minimizing excess fat.</p>
+          <ul>
+            <li><strong>Caloric surplus:</strong> 300-500 kcal/day surplus. Excessive surplus (>500 kcal) increases fat gain without additional muscle benefit (Helms et al., 2014).</li>
+            <li><strong>Progressive overload:</strong> Primary driver of hypertrophy. Increase weight, reps, or sets consistently over weeks/months. Track lifts in a log.</li>
+            <li><strong>Volume programming:</strong> 15-25 sets per muscle group weekly optimal. Split volume across 2-3 sessions per muscle.</li>
+            <li><strong>Nutrient timing:</strong> Post-workout nutrition (protein + carbs within 2 hours) supports recovery and protein synthesis. Leucine threshold ~2.5g per meal.</li>
+            <li><strong>Patience required:</strong> Expect 0.5-1 lb/week gain. Slower gains with better muscle/fat ratio than aggressive bulks.</li>
+          </ul>
+          <p><strong>Nutrition:</strong> Protein: 1.6-2.2g/kg. Carbs: 3-5g/kg (fuel training). Fats: 0.8-1.2g/kg. Micronutrient variety critical for hormonal health.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Periodization</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Periodization</strong> is strategic cycling of training variables to optimize adaptation, prevent plateaus, and reduce overtraining risk. Essential for long-term progression.</p>
+          <ul>
+            <li><strong>Linear periodization:</strong> Gradually increase intensity, decrease volume weekly over 4-6 weeks. Example: Week 1 (3×12), Week 2 (3×10), Week 3 (3×8), Week 4 (3×6). Proven effective for strength.</li>
+            <li><strong>Undulating (daily):</strong> Vary intensity/volume within same week. Example: Monday (heavy 6 reps), Wednesday (moderate 10 reps), Friday (light 15 reps). Superior for maintaining size during strength phases.</li>
+            <li><strong>Block periodization:</strong> Training blocks lasting 3-4 weeks focusing on specific qualities: Hypertrophy block → Strength block → Power block.</li>
+            <li><strong>Deload importance:</strong> Every 4-8 weeks, reduce volume by 40-60% for 1 week. Allows recovery, CNS restoration, and connective tissue adaptation.</li>
+            <li><strong>Conjugate method:</strong> Concurrent training of all qualities (max effort, dynamic effort, hypertrophy) within same week. Complex but highly effective for advanced lifters.</li>
+          </ul>
+          <p><strong>Key principle:</strong> Systematic variation prevents adaptive resistance. Beginners can progress linearly 6-12 months; advanced lifters need periodization.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Progressive Overload</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Progressive overload</strong> is the fundamental principle of gradually increasing training demands. Without it, adaptation plateaus within 2-3 weeks.</p>
+          <ul>
+            <li><strong>Weight progression:</strong> Increase load 2.5-5% when hitting rep target. For example: Hit 10 reps → increase weight → aim for 8-10 next week.</li>
+            <li><strong>Rep progression:</strong> Add 1-2 reps weekly before increasing weight. If targeting 8-10 reps at 200 lbs, add 1 rep weekly until 10 reps achieved.</li>
+            <li><strong>Volume increase:</strong> Add 1 set per exercise every 2-3 weeks. Progressive volume prevents plateau while managing fatigue.</li>
+            <li><strong>Density:</strong> Complete same volume in less time. Example: Reduce rest periods from 90s to 75s, or perform 20 reps in 10 minutes instead of 12.</li>
+            <li><strong>Exercise variation:</strong> Switch exercises (barbell squat → paused squat → pause-rep squats) to stress muscles differently while progressing.</li>
+            <li><strong>Tracking critical:</strong> Log all sets, reps, weights. Data-driven training beats "feeling it." Review weekly for trends.</li>
+          </ul>
+          <p><strong>Practical example:</strong> Bench press: Week 1 (185×8,8,8) → Week 2 (185×9,9,8) → Week 3 (185×10,10,9) → Week 4 (190×8,8,8). Repeat cycle.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Nutrition for Performance</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Nutrition directly impacts performance, recovery, and body composition.</strong> Optimal fueling is as important as the training stimulus itself.</p>
+          <ul>
+            <li><strong>Macronutrient balance:</strong> Protein 1.6-2.2g/kg (preserves muscle), Carbs 3-7g/kg (depends on volume), Fats 0.8-1.2g/kg (hormonal health, brain function).</li>
+            <li><strong>Pre-workout (1-3 hours):</strong> Carbs (40-80g) + protein (20-40g) + low fat. Examples: oats with banana, rice with chicken, pasta with lean meat. Timing optimizes glycogen and amino acid availability.</li>
+            <li><strong>Intra-workout (>60 min sessions):</strong> Simple carbs (30-60g/hour) + electrolytes if training >90 minutes. Maintains blood glucose and reduces fatigue.</li>
+            <li><strong>Post-workout (within 2 hours):</strong> Protein (30-50g) + carbs (80-120g). Leucine threshold ~2.5g per meal triggers mTOR. Glycogen repletion critical for recovery.</li>
+            <li><strong>Daily hydration:</strong> 0.5-1 oz per lb body weight minimum. Dehydration >2% impairs strength by ~5% (Sawka et al., 2007). Electrolytes (sodium/potassium) matter for absorption and performance.</li>
+          </ul>
+          <p><strong>Micronutrients:</strong> Iron (oxygen transport), zinc (testosterone), magnesium (muscle function), vitamins B & D (energy, immune function). Whole food variety > supplementation for most.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Recovery & Sleep</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Recovery is where adaptation happens.</strong> Sleep, nutrition, and stress management are non-negotiable for progress. Overtraining without adequate recovery blocks gains.</p>
+          <ul>
+            <li><strong>Sleep duration:</strong> 7-9 hours nightly. <7 hours reduces testosterone (~20%), increases cortisol, impairs protein synthesis (Walker, 2017). Even one night of poor sleep reduces strength ~5-10%.</li>
+            <li><strong>Sleep quality:</strong> Consistent bedtime, dark/cool room (65-68°F optimal), avoid screens 1 hour before bed. REM and deep sleep both critical; light exposure affects circadian rhythm.</li>
+            <li><strong>Deload weeks:</strong> Every 4-8 weeks reduce volume by 40-60% for 7 days. Prevents accumulation of CNS fatigue, allows connective tissue adaptation, restores motivation.</li>
+            <li><strong>Active recovery:</strong> Light cardio, stretching, yoga on off-days improve blood flow and recovery without additional stress. 20-30 min low intensity optimal.</li>
+            <li><strong>Mobility work:</strong> 10-15 min daily foam rolling and stretching reduces DOMS, improves range of motion, and prevents injury. Focus on tight areas (hips, shoulders, thoracic spine).</li>
+            <li><strong>Stress management:</strong> Cortisol (stress hormone) impairs recovery and promotes catabolism. Meditation, walks, social connection all reduce stress.</li>
+          </ul>
+          <p><strong>Signs of overtraining:</strong> Stalled strength, elevated resting HR, poor sleep, increased injury risk, mood deterioration. Solution: deload or reduce volume for 1 week.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Supplement Guide</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Supplements amplify good training and nutrition, not replace them.</strong> Only evidence-based supplements are worth money. Hierarchy: training → nutrition → sleep → supplementation.</p>
+          <ul>
+            <li><strong>Protein powder:</strong> Whey, casein, or plant-based. Convenient way to hit 1.6-2.2g/kg target. Whey isolate 20-30g per serving. Cost-effective vs whole food.</li>
+            <li><strong>Creatine monohydrate:</strong> 5g/day, any time. Increases muscle creatine stores, improving ATP availability. ~10% strength gain, especially in strength/power traits (Kreider et al., 2017). Side effect: slight water retention (1-2 lbs).</li>
+            <li><strong>Caffeine:</strong> 3-5mg/kg 30-60 min pre-workout. Increases alertness, strength output (~3%), endurance (~2-3%). Don't use daily; tolerance develops. Avoid after 2pm.</li>
+            <li><strong>Beta-alanine:</strong> 3-5g/day divided doses. Increases carnosine, buffering lactate in high-rep (>60 sec) work. Modest 2-3% endurance gain. Causes harmless tingling sensation.</li>
+            <li><strong>Multivitamin:</strong> Only necessary if diet lacks variety. Specific deficiencies (iron, B12, D3) matter; random megadosing doesn't help.</li>
+            <li><strong>Citrulline malate:</strong> 6-8g pre-workout improves pump and reduces DOMS. Research shows ~2-3% performance improvement.</li>
+          </ul>
+          <p><strong>Avoid:</strong> Proprietary blends, testosterone boosters (ineffective), pre-workout "formulas" with excessive stimulants. Stick to proven standalones.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Mindset & Consistency</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Mental discipline and consistency determine long-term success more than any single workout.</strong> Progress is a product of small choices repeated thousands of times.</p>
+          <ul>
+            <li><strong>Goal setting:</strong> SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound). Examples: "Bench press 225 lbs in 12 weeks" vs vague "get stronger." Measurable goals drive accountability.</li>
+            <li><strong>Tracking & data:</strong> Log every workout. Track lifts, body weight, photos. Data removes emotion. Weekly review identifies trends and required adjustments. Spreadsheets or apps (HEVY, Strong, JeFit) make this easy.</li>
+            <li><strong>Consistency over perfection:</strong> 80% effort 90% of the time beats 100% effort 20% of the time. Missing one workout doesn't matter; missing patterns does. Build identity: "I am someone who lifts 3x/week."</li>
+            <li><strong>Expected plateaus:</strong> Linear progress is impossible indefinitely. Every 3-4 weeks expect progress to stall. This is normal; adjust stimulus (increase volume, change exercises, add intensity technique).</li>
+            <li><strong>Process over outcome:</strong> Control effort, consistency, technique. Don't obsess over scale weight (influenced by water, glycogen, digestion). Focus on strength metrics and composition markers.</li>
+            <li><strong>Community & accountability:</strong> Training partners increase adherence 95% (vs 76% solo). Share goals with someone. Join online communities. Competition drives consistency.</li>
+          </ul>
+          <p><strong>Mindset shift:</strong> Reframe failure. Missed set? Learning opportunity. Bad week? Chance to reset. This growth mindset (Dweck) predicts long-term success over fixed mindset.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOALS TAB -->
+  <div class="tab-content" data-tab="goals">
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Hypertrophy</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Hypertrophy</strong> is the process of increasing muscle size through progressive resistance training. Focus on moderate to high volume, moderate reps (6–15), and short rest periods (30–90s).</p>
+          <ul>
+            <li>Use compound movements (bench press, squat, deadlift) for large muscle recruitment.</li>
+            <li>Include isolation exercises for targeting specific muscles.</li>
+            <li>Prioritize form and controlled tempo for maximum tension.</li>
+            <li>Progressive overload is key: increase weight, reps, or sets over time.</li>
+          </ul>
+          <p>Nutrition: Ensure a slight caloric surplus with sufficient protein (1.6–2.2g/kg).</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Strength</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Strength training</strong> focuses on increasing the maximum force your muscles can produce. Lower reps (1–6), heavier loads, and longer rest periods (2–5 min) are typical.</p>
+          <ul>
+            <li>Incorporate compound lifts like squats, bench press, and deadlifts.</li>
+            <li>Use periodization techniques to manage intensity and volume.</li>
+            <li>Accessory work targets weak points.</li>
+          </ul>
+          <p>Nutrition: Caloric maintenance or slight surplus, focus on protein to support recovery.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Endurance</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p><strong>Endurance training</strong> improves muscular and cardiovascular stamina. Higher reps (12–30+), lower loads, and short rest periods (30–60s).</p>
+          <ul>
+            <li>Include circuits, bodyweight, and aerobic conditioning.</li>
+            <li>Focus on pacing and consistent technique.</li>
+          </ul>
+          <p>Nutrition: Maintain caloric balance, prioritize carbs for energy.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Weight Loss</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Fat loss requires a caloric deficit while maintaining muscle mass.</p>
+          <ul>
+            <li>Strength training helps preserve lean mass.</li>
+            <li>Cardio can be used strategically for extra calories burned.</li>
+            <li>Focus on high protein intake (2g/kg) and fiber-rich foods.</li>
+            <li>Track progress consistently (body composition, not just weight).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Weight Gain / Bulking</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Building lean muscle mass requires a controlled caloric surplus and progressive overload.</p>
+          <ul>
+            <li>Train with moderate-high volume and compound lifts.</li>
+            <li>Include accessory work for symmetry and weak points.</li>
+            <li>Focus on nutrient-dense foods, maintain protein intake (1.6–2.2g/kg).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METHODS TAB -->
+  <div class="tab-content" data-tab="methods">
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Periodization</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Periodization structures training to optimize adaptation and avoid plateaus.</p>
+          <ul>
+            <li>Linear: Gradually increasing intensity over time.</li>
+            <li>Undulating: Frequent changes in reps and intensity.</li>
+            <li>Block: Focused training blocks for specific qualities.</li>
+            <li>Conjugate: Mix of max effort, dynamic effort, and hypertrophy work.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Progressive Overload</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Constantly challenging your muscles is critical for growth and strength.</p>
+          <ul>
+            <li>Increase weight, reps, sets, or time under tension progressively.</li>
+            <li>Track lifts and adapt intelligently to avoid injury.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NUTRITION TAB -->
+  <div class="tab-content" data-tab="nutrition">
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Nutrition for Performance</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Fueling your body correctly enhances performance and recovery.</p>
+          <ul>
+            <li>Balance macros: protein, carbs, and fats according to goals.</li>
+            <li>Pre-workout: carbs + moderate protein for energy.</li>
+            <li>Post-workout: protein + carbs for recovery.</li>
+            <li>Hydration and micronutrients matter.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Recovery & Sleep</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Recovery is where progress happens—don't neglect it.</p>
+          <ul>
+            <li>Sleep 7–9 hours per night for hormone regulation.</li>
+            <li>Deload every 4–8 weeks to avoid overtraining.</li>
+            <li>Mobility, stretching, and foam rolling help reduce injury risk.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Supplement Guide</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Use supplements strategically; they are not a replacement for nutrition.</p>
+          <ul>
+            <li>Protein powders to meet daily intake.</li>
+            <li>Creatine monohydrate for strength and hypertrophy.</li>
+            <li>Caffeine pre-workout for focus and energy.</li>
+            <li>Multivitamins if your diet lacks variety.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINDSET TAB -->
+  <div class="tab-content" data-tab="mindset">
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Mindset & Consistency</h2>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-content">
+          <p>Training isn't just physical; mental habits matter most.</p>
+          <ul>
+            <li>Set clear goals and track them.</li>
+            <li>Stay consistent; progress compounds over time.</li>
+            <li>Embrace failure as learning, not discouragement.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-results" id="noResults" style="display: none;">
+    No topics found. Try a different search.
+  </div>
+
+</div>
+
+<script>
+// Tab functionality
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const tabName = tab.getAttribute('data-tab');
+    
+    // Deactivate all tabs and contents
+    tabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(tc => tc.classList.remove('active'));
+    
+    // Activate selected tab and content
+    tab.classList.add('active');
+    document.querySelector(`.tab-content[data-tab="${tabName}"]`).classList.add('active');
+  });
+});
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const cards = document.querySelectorAll('.card');
+const noResults = document.getElementById('noResults');
+
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  let visibleCount = 0;
+
+  cards.forEach(card => {
+    const title = card.querySelector('.card-header h2').textContent.toLowerCase();
+    const content = card.querySelector('.card-content').textContent.toLowerCase();
+    const matches = title.includes(query) || content.includes(query) || query === '';
+
+    if (matches) {
+      card.style.display = '';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  noResults.style.display = visibleCount === 0 && query !== '' ? 'block' : 'none';
+});
+
+// Accordion functionality: only one card open at a time
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    cards.forEach(c => {
+      if (c !== card) c.classList.remove('active');
+    });
+    card.classList.toggle('active');
+  });
+});
+</script>
+
+</body>
+</html>
